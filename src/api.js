@@ -6,7 +6,9 @@
  * hammering the backend when the page reloads.
  */
 
-const API_BASE = import.meta.env.VITE_API || "";
+// Backend origin. VITE_API (build-time env) can override this; the deployed
+// default below is the live Vercel API so the site works with no repo vars.
+const API_BASE = import.meta.env.VITE_API || "https://market-sig-server.vercel.app";
 
 const CACHE_TTL = {
   overview: 60_000,

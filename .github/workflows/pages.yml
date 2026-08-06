@@ -23,24 +23,21 @@ jobs:
         with:
           node-version: 22
           cache: npm
-          cache-dependency-path: client/package-lock.json
+          cache-dependency-path: package-lock.json
       - name: Install dependencies
-        working-directory: client
         run: npm ci
       - name: Build
-        working-directory: client
         run: npm run build
         env:
           # Subpath on GitHub Pages: https://exwayz.github.io/market-sig/
           VITE_BASE: /market-sig/
-          # Backend origin. Set a repository Variable named VITE_API
-          # (Settings -> Secrets and variables -> Actions -> Variables)
-          # to your deployed backend URL, e.g. https://market-sig-api.onrender.com
-          VITE_API: ${{ vars.VITE_API || '' }}
+          # Backend origin. Falls back to the deployed Vercel API; a repository
+          # Variable named VITE_API can still override it if needed.
+          VITE_API: ${{ vars.VITE_API || 'https://market-sig-server.vercel.app' }}
       - name: Upload artifact
         uses: actions/upload-pages-artifact@v3
         with:
-          path: client/dist
+          path: dist
 
   deploy:
     needs: build
