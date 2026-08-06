@@ -22,6 +22,7 @@ npm run build    # production bundle to dist/
 ```
 
 Point at a remote server with `VITE_API=https://host` (override base URL).
+The deployed default is the live Vercel backend (`market-sig-server.vercel.app`).
 
 ## Deploy
 
@@ -31,26 +32,26 @@ Pushes to `main` build the site via `.github/workflows/pages.yml` and publish
 it to `https://exwayz.github.io/market-sig/`.
 
 1. In the repo: **Settings → Pages → Build and deployment → Source**:
-   select **GitHub Actions** (replaces the "deploy from branch" setting).
-2. Set the backend URL as a repository variable named **`VITE_API`**
-   (Settings → Secrets and variables → Actions → Variables), e.g.
-   `https://your-backend-host`. Without it the site builds but `/api` calls
-   point at GitHub Pages itself and fail.
+   select **GitHub Actions**.
+2. The backend URL is baked into `src/api.js` by default; an optional
+   repository variable named **`VITE_API`** (Settings → Secrets and
+   variables → Actions → Variables) overrides it.
 3. Push to `main` (or run the workflow manually).
+
+Live: `https://exwayz.github.io/market-sig/` → `https://market-sig-server.vercel.app`
 
 Local test of the exact production build:
 
 ```bash
-VITE_BASE=/market-sig/ VITE_API=https://your-backend npm run build
+VITE_BASE=/market-sig/ VITE_API=https://market-sig-server.vercel.app npm run build
 npx vite preview
 ```
 
 ### Backend
 
-The API server must run somewhere **persistent and always-on** — it holds the
-SQLite history and a background collector, so serverless hosts (Vercel,
-Netlify, etc.) are not viable. Any always-on host works; it reads `PORT`,
-`DATA_DIR` and `WARERA_API_KEY` from the environment and CORS is open.
+Deployed to Vercel (`market-sig-server` project). The API is stateless: it
+serves the committed JSON files under `data/`, refreshed hourly by the GitHub
+Actions `collect-market-data` workflow. See the `market-sig-server` repo.
 
 
 ## Pages / features
