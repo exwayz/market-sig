@@ -1,0 +1,205 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0, maximum-scale=1.0, user-scalable=no">
+  <title>War Era Market Signal</title>
+  <meta name="description" content="Market signaling dashboard for the War Era economy — buy, hold, and sell signals for every commodity.">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Literata:opsz,wght@7..72,400;7..72,600;7..72,700&family=Fira+Code:wght@400;500&display=swap" rel="stylesheet">
+  <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.7.2/css/all.min.css">
+  <link rel="stylesheet" href="/style.css">
+</head>
+<body>
+  <main class="app">
+    <!-- Header -->
+    <header class="header">
+      <div class="header-left">
+        <div class="title-row">
+          <h1>War Era <span class="accent">Market Signal</span></h1>
+          <button type="button" class="info-btn" id="btn-info" aria-label="About the signals" title="About the signals">
+            <i class="fa-solid fa-circle-question"></i>
+          </button>
+        </div>
+        <p class="subtitle" id="status-line">connecting to signal server...</p>
+      </div>
+      <div class="header-right">
+        <div class="mode-toggle" role="tablist" aria-label="Market view">
+          <button class="mode-btn active" data-view="market" id="btn-market">
+            <i class="fa-solid fa-chart-line"></i>
+            Market
+          </button>
+          <button class="mode-btn" data-view="ticker" id="btn-ticker">
+            <i class="fa-solid fa-arrow-right-arrow-left"></i>
+            Ticker
+          </button>
+        </div>
+        <button class="refresh-btn" id="btn-refresh" title="Refresh now">
+          <i class="fa-solid fa-rotate-right"></i>
+          <span class="refresh-spinner"></span>
+        </button>
+      </div>
+    </header>
+
+    <div class="separator"></div>
+
+    <!-- Market index -->
+    <section class="section" id="view-market">
+      <div class="index-grid">
+        <div class="index-card">
+          <div class="section-label">Market index</div>
+          <div class="index-value" id="index-value">—</div>
+          <div class="index-change" id="index-change">—</div>
+        </div>
+        <div class="index-card">
+          <div class="section-label">Market breadth</div>
+          <div class="breadth-row">
+            <div class="breadth-cell" id="breadth-bullish"><b>—</b><span>bullish</span></div>
+            <div class="breadth-cell" id="breadth-neutral"><b>—</b><span>neutral</span></div>
+            <div class="breadth-cell" id="breadth-bearish"><b>—</b><span>bearish</span></div>
+          </div>
+          <div class="breadth-bar" id="breadth-bar" aria-hidden="true">
+            <div class="breadth-fill bullish" id="breadth-fill-bull"></div>
+            <div class="breadth-fill neutral" id="breadth-fill-neutral"></div>
+            <div class="breadth-fill bearish" id="breadth-fill-bear"></div>
+          </div>
+        </div>
+        <div class="index-card index-card-wide">
+          <div class="section-label">Composite index · 30d</div>
+          <canvas id="index-chart" class="chart-canvas" height="220" aria-label="Composite market index chart"></canvas>
+        </div>
+      </div>
+    </section>
+
+    <div class="separator"></div>
+
+    <!-- Signal legend -->
+    <section class="section">
+      <div class="legend-scroll">
+        <table class="legend-table">
+          <thead>
+            <tr><th>Signal</th><th>Meaning</th><th>Confidence</th></tr>
+          </thead>
+          <tbody>
+            <tr data-sig="-3"><td class="sig-cell"><span class="sig-badge sig-3">Strong Sell</span></td><td>Sell immediately. Downside risk is very high.</td><td>Very Bearish</td></tr>
+            <tr data-sig="-2"><td class="sig-cell"><span class="sig-badge sig-2">Sell</span></td><td>Selling is advised due to poor prospects.</td><td>Bearish</td></tr>
+            <tr data-sig="-1"><td class="sig-cell"><span class="sig-badge sig-1">Reduce</span></td><td>Reduce position; exiting completely is not yet necessary.</td><td>Slightly Bearish</td></tr>
+            <tr data-sig="0"><td class="sig-cell"><span class="sig-badge sig-0">Hold</span></td><td>Maintain position. No clear signal to buy or sell yet.</td><td>Neutral</td></tr>
+            <tr data-sig="1"><td class="sig-cell"><span class="sig-badge sig-1">Accumulate</span></td><td>Begin buying gradually.</td><td>Slightly Bullish</td></tr>
+            <tr data-sig="2"><td class="sig-cell"><span class="sig-badge sig-2">Buy</span></td><td>Worth buying. Upside prospects are quite good.</td><td>Bullish</td></tr>
+            <tr data-sig="3"><td class="sig-cell"><span class="sig-badge sig-3">Strong Buy</span></td><td>Highly recommended to buy. Momentum and fundamentals are very strong.</td><td>Very Bullish</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="separator"></div>
+
+    <!-- Items table -->
+    <section class="section">
+      <div class="table-toolbar">
+        <label class="section-label">Commodities</label>
+        <div class="toolbar-right">
+          <div class="filter-group">
+            <input type="search" id="search-input" placeholder="filter..." spellcheck="false">
+            <button class="btn btn-small" id="btn-clear-filter" title="Clear filter">Clear</button>
+          </div>
+          <div class="filter-group">
+            <span class="filter-label">signal</span>
+            <select id="signal-filter">
+              <option value="">all</option>
+              <option value="3">strong buy</option>
+              <option value="2">buy</option>
+              <option value="1">accumulate</option>
+              <option value="0">hold</option>
+              <option value="-1">reduce</option>
+              <option value="-2">sell</option>
+              <option value="-3">strong sell</option>
+            </select>
+          </div>
+        </div>
+      </div>
+      <div class="table-wrap">
+        <table class="items-table" id="items-table">
+          <thead>
+            <tr>
+              <th data-sort="code">Item <i class="fa-solid fa-sort"></i></th>
+              <th data-sort="price">Price <i class="fa-solid fa-sort"></i></th>
+              <th data-sort="change1d">1d % <i class="fa-solid fa-sort"></i></th>
+              <th data-sort="change7d">7d % <i class="fa-solid fa-sort"></i></th>
+              <th data-sort="spreadPct">Spread <i class="fa-solid fa-sort"></i></th>
+              <th data-sort="imbalance">Pressure <i class="fa-solid fa-sort"></i></th>
+              <th data-sort="rsi">RSI <i class="fa-solid fa-sort"></i></th>
+              <th data-sort="volume3d">Vol 3d <i class="fa-solid fa-sort"></i></th>
+              <th data-sort="confidence">Conf <i class="fa-solid fa-sort"></i></th>
+              <th data-sort="signal">Signal <i class="fa-solid fa-sort"></i></th>
+            </tr>
+          </thead>
+          <tbody id="items-body">
+            <tr class="empty-row"><td colspan="10">loading...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <div class="separator"></div>
+
+    <!-- Ticker view -->
+    <section class="section" id="view-ticker" hidden>
+      <label class="section-label">Live trade feed</label>
+      <div class="ticker-wrap">
+        <table class="items-table ticker-table">
+          <thead>
+            <tr>
+              <th>Item</th><th>Qty</th><th>Price</th><th>Total</th><th>Side</th><th>Time</th>
+            </tr>
+          </thead>
+          <tbody id="ticker-body">
+            <tr class="empty-row"><td colspan="6">loading feed...</td></tr>
+          </tbody>
+        </table>
+      </div>
+    </section>
+
+    <footer class="bottom-bar">
+      Market Signal reads the <a href="https://app.warera.io/market" target="_blank" rel="noopener">War Era</a> economy. Signal ≠ financial advice — trade responsibly.
+    </footer>
+  </main>
+
+  <!-- Info modal -->
+  <div class="modal-overlay" id="modal-overlay" hidden>
+    <div class="modal" role="dialog" aria-modal="true" aria-labelledby="modal-title">
+      <div class="modal-header">
+        <h2 id="modal-title">How Market Signal works</h2>
+        <button type="button" class="modal-close" id="modal-close" aria-label="Close"><i class="fa-solid fa-xmark"></i></button>
+      </div>
+      <div class="modal-sep"></div>
+      <div class="modal-body">
+        <p>Market Signal watches every tradable commodity in the War Era economy and turns it into a <strong>7-level signal</strong>, from Strong Sell to Strong Buy.</p>
+        <h3>Data</h3>
+        <p>Every few minutes the collector snapshots the <strong>index price</strong> and the <strong>order book</strong> for all 23 commodities, plus a live trade feed. Each item also keeps 30 days of daily aggregates (average price, volume, transactions).</p>
+        <h3>What moves the signal</h3>
+        <ul>
+          <li><strong>Trend</strong> — price position vs 5/10/20-day averages and short-term momentum.</li>
+          <li><strong>RSI</strong> — a blend of momentum and mean-reversion (oversold buys, overbought sells).</li>
+          <li><strong>Pressure</strong> — bid vs ask depth imbalance in the order book.</li>
+          <li><strong>Volume</strong> — does recent volume confirm or contradict the trend.</li>
+          <li><strong>Intraday</strong> — movement since the last snapshot.</li>
+        </ul>
+        <h3>Confidence</h3>
+        <p>A 0–100% confidence reflects <strong>liquidity</strong> (spread + depth), how <strong>aligned</strong> the components are, and the <strong>quality</strong> of the history.</p>
+        <h3>Try it</h3>
+        <p>Click any row in the commodities table to open the item dashboard — price history, volume, order-book depth and the full signal breakdown.</p>
+      </div>
+    </div>
+  </div>
+
+  <!-- Item detail modal -->
+  <div class="modal-overlay detail-overlay" id="detail-overlay" hidden>
+    <div class="modal detail-modal" id="detail-modal"></div>
+  </div>
+
+  <script type="module" src="/src/main.js"></script>
+</body>
+</html>
