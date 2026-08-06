@@ -26,19 +26,33 @@ The deployed default is the live Vercel backend (`market-sig-server.vercel.app`)
 
 ## Deploy
 
-### GitHub Pages (frontend)
+### Vercel (frontend — live)
 
-Pushes to `main` build the site via `.github/workflows/pages.yml` and publish
-it to `https://exwayz.github.io/market-sig/`.
+The frontend runs as a static Vite site on Vercel:
+
+- Live: `https://client-five-psi-58.vercel.app/` (also
+  `https://client-dlsq8l2mu-exwayzs-projects.vercel.app`)
+- Backend: `https://market-sig-server.vercel.app`
+
+Deploy from this directory:
+
+```bash
+npx vercel --prod
+```
+
+The build auto-detects Vite (`vite build`, output `dist`). The backend URL is
+baked into `src/api.js`; an env var `VITE_API` overrides it.
+
+### GitHub Pages (alternative)
+
+Pushes to `main` can also build the site via `.github/workflows/pages.yml` to
+`https://exwayz.github.io/market-sig/`:
 
 1. In the repo: **Settings → Pages → Build and deployment → Source**:
    select **GitHub Actions**.
 2. The backend URL is baked into `src/api.js` by default; an optional
-   repository variable named **`VITE_API`** (Settings → Secrets and
-   variables → Actions → Variables) overrides it.
+   repository variable named **`VITE_API`** overrides it.
 3. Push to `main` (or run the workflow manually).
-
-Live: `https://exwayz.github.io/market-sig/` → `https://market-sig-server.vercel.app`
 
 Local test of the exact production build:
 
