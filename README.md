@@ -23,6 +23,36 @@ npm run build    # production bundle to dist/
 
 Point at a remote server with `VITE_API=https://host` (override base URL).
 
+## Deploy
+
+### GitHub Pages (frontend)
+
+Pushes to `main` build the site via `.github/workflows/pages.yml` and publish
+it to `https://exwayz.github.io/market-sig/`.
+
+1. In the repo: **Settings → Pages → Build and deployment → Source**:
+   select **GitHub Actions** (replaces the "deploy from branch" setting).
+2. Set the backend URL as a repository variable named **`VITE_API`**
+   (Settings → Secrets and variables → Actions → Variables), e.g.
+   `https://your-backend-host`. Without it the site builds but `/api` calls
+   point at GitHub Pages itself and fail.
+3. Push to `main` (or run the workflow manually).
+
+Local test of the exact production build:
+
+```bash
+VITE_BASE=/market-sig/ VITE_API=https://your-backend npm run build
+npx vite preview
+```
+
+### Backend
+
+The API server must run somewhere **persistent and always-on** — it holds the
+SQLite history and a background collector, so serverless hosts (Vercel,
+Netlify, etc.) are not viable. Any always-on host works; it reads `PORT`,
+`DATA_DIR` and `WARERA_API_KEY` from the environment and CORS is open.
+
+
 ## Pages / features
 
 - **Market view** — composite index chart (30d daily + intraday tail),
